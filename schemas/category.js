@@ -8,7 +8,11 @@ let categorySchema = new mongoose.Schema({
     },description:{
         type:String,
         default:""
-    }
+    },slug: {
+         type: String, 
+         unique: true, 
+         required: true 
+        }
 },{
     timestamps:true
 })

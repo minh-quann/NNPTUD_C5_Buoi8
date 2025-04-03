@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 let categoryModel = require('../schemas/category')
-
+let slugify = require('slugify');
 
 /* GET users listing. */
 router.get('/', async function(req, res, next) {
@@ -30,21 +30,29 @@ router.get('/:id', async function(req, res, next) {
   }
 });
 
-router.post('/', async function(req, res, next) {
+router.post('/', async function(req, res) {
   try {
-    let newCategory = new categoryModel({
-      name: req.body.name,
-    })
-    await newCategory.save();
-    res.status(200).send({
-      success:true,
-      data:newCategory
-    });
+      let newCategory = new categoryModel({
+          name: req.body.name,
+          slug: slugify(req.body.name, { lower: true, strict: true })
+      });
+      await newCategory.save();
+      res.status(200).send({ success: true, data: newCategory });
   } catch (error) {
-    res.status(404).send({
-      success:false,
-      message:error.message
-    });
+      res.status(500).send({ success: false, message: error.message });
+  }
+});
+router.put('/:id', async function(req, res) {
+  try {
+      let updateObj = {};
+      if (req.body.name) {
+          updateObj.name = req.body.name;
+          updateObj.slug = slugify(req.body.name, { lower: true, strict: true });
+      }
+      let updatedCategory = await categoryModel.findByIdAndUpdate(req.params.id, updateObj, { new: true });
+      res.status(200).send({ success: true, data: updatedCategory });
+  } catch (error) {
+      res.status(500).send({ success: false, message: error.message });
   }
 });
 

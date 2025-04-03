@@ -28,7 +28,11 @@ let productSchema = new mongoose.Schema({
     ,isDeleted:{
         type:Boolean,
         default:false
-    }
+    },slug: {
+         type: String, 
+         unique: true, 
+         required: true 
+        }
 },{
     timestamps:true
 })
